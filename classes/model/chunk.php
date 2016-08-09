@@ -14,13 +14,14 @@ class ThreadChunk extends Board
         $posts = $result->getObject()->getBuilderParamManager()->getParam('chunk_posts');
         $npage = $result->getObject()->getBuilderParamManager()->getParam('chunk_page') + 1;
         $omitted = $result->getObject()->getBuilderParamManager()->getParam('chunk_omitted');
+        $start = $result->getObject()->getBuilderParamManager()->getParam('chunk_start');
         ?>
         <link href="<?= $result->getObject()->getBuilderParamManager()->getParam('chunk_css') ?>" rel="stylesheet"
               type="text/css"/>
         <div class="pagecontainer"></div>
         <div class="threadchunk">Showing
-            posts <?= $result->getObject()->getBuilderParamManager()->getParam('chunk_start') ?>
-            to <?= $result->getObject()->getBuilderParamManager()->getParam('chunk_start') + $posts ?>. Posts still in
+            posts <?= $start ?>
+            to <?= $start + $posts ?>. Posts still in
             this thread <?= $omitted ?>
             <?php if ($omitted != 0) : ?>
                 <a class="btnr chunknext"

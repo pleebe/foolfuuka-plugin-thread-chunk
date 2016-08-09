@@ -1,7 +1,7 @@
 {
   "name": "foolz/foolfuuka-plugin-thread-chunk",
   "type": "foolz-foolfuuka-plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Show threads in chunks.",
   "keywords": ["thread","chunk"],
   "homepage": "http://www.4plebs.org",

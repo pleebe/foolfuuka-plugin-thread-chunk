@@ -89,6 +89,10 @@ class ThreadChunk extends \Foolz\FoolFuuka\Controller\Chan
             ->setCall('Foolz\FoolFuuka\Plugins\ThreadChunk\Model\ThreadChunk::renderunder')
             ->setPriority(5);
 
+        Event::forge(['foolfuuka.themes.fuuka_after_body_template'])
+            ->setCall('Foolz\FoolFuuka\Plugins\ThreadChunk\Model\ThreadChunk::renderunder')
+            ->setPriority(5);
+
         $this->response->setCallback(function () {
             $this->builder->stream();
         });
