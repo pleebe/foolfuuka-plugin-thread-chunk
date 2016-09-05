@@ -1,6 +1,7 @@
 # FoolFuuka Plugin Thread Chunk
 Show threads in chunks. Provided as is. No warranty implied nor provided.
 
+Clone to your plugins directory and enable it from the plugins admin page.
 Adds board route to 
 ```
 /$shortnam/chunk/$thread_num/
