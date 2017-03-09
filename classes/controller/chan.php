@@ -68,7 +68,7 @@ class ThreadChunk extends \Foolz\FoolFuuka\Controller\Chan
         $this->builder->getParamManager()->setParams([
             'chunk_num' => $num,
             'chunk_posts' => $posts,
-            'chunk_page' => ($start - 1),
+            'chunk_page' => $start,
             'chunk_start' => ($start - 1) * $posts,
             'chunk_omitted' => $omit,
             'chunk_js' => $this->plugin->getAssetManager()->getAssetLink('chunk.js'),
