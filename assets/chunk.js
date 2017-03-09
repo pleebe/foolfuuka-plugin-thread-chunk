@@ -13,10 +13,9 @@ function doit() {
                     url: el.attr('href'),
                     type: 'GET',
                     success: function (data, textStatus, jqXHR) {
-                        var comments = $(data).find('aside.posts').html();
-                        var newtext = $(data).find('.threadchunk').html();
-                        $(".pagecontainer").append('<article class="thread"><aside class="posts">' + comments + '</aside></article>');
-                        $('.threadchunk').html(newtext);
+                        $(".pagecontainer").append('<article class="thread"><aside class="posts">' + $(data).find('aside.posts').html() + '</aside></article>');
+                        $(".threadchunk").html($(data).find('.threadchunk').html());
+                        $(".paginate").html($(data).find('.paginate').html());
                         doit();
                     }
                 })
