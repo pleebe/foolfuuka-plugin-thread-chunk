@@ -44,10 +44,9 @@ class ThreadChunk extends Board
             ->fetch();
     }
 
-    protected function p_getThreadChunk($radix, $num, $posts, $start)
+    protected function p_getQueryResults($radix, $num, $posts, $start)
     {
-        $query_result = [];
-        $query_result = $this->dc->qb()
+        return $this->dc->qb()
             ->select('*')
             ->from($radix->getTable(), 'r')
             ->leftJoin('r', $radix->getTable('_images'), 'mg', 'mg.media_id = r.media_id')
@@ -59,18 +58,24 @@ class ThreadChunk extends Board
             ->setFirstResult($start)
             ->execute()
             ->fetchAll();
+    }
+
+    protected function p_getThreadChunk($radix, $num, $posts, $start)
+    {
+        $query_result = [];
+        $query_result = $this->getQueryresults($radix, $num, $posts, $start);
 
         if (!count($query_result)) {
             throw new \Exception();
         }
 
-        $comments_unsorted = [];
+        $this->comments_unsorted = [];
 
         foreach ($query_result as $key => $row) {
             $data = new CommentBulk();
             $data->import($row, $radix);
             unset($query_result[$key]);
-            $comments_unsorted[] = $data;
+            $this->comments_unsorted[] = $data;
         }
 
         unset($query_result);
@@ -79,14 +84,17 @@ class ThreadChunk extends Board
             'images_omitted' => 0
         ];
 
-        foreach ($comments_unsorted as $key => $bulk) {
+        foreach ($this->comments_unsorted as $key => $bulk) {
             if ($bulk->comment->op == 0) {
                 $comments[$bulk->comment->thread_num]['posts']
-                [$bulk->comment->num . (($bulk->comment->subnum == 0) ? '' : '_' . $bulk->comment->subnum)] = &$comments_unsorted[$key];
+                [$bulk->comment->num . (($bulk->comment->subnum == 0) ? '' : '_' . $bulk->comment->subnum)] = &$this->comments_unsorted[$key];
             } else {
-                $comments[$bulk->comment->num]['op'] = &$comments_unsorted[$key];
+                $comments[$bulk->comment->num]['op'] = &$this->comments_unsorted[$key];
             }
         }
+
+        $this->loadBacklinks();
+
         return $comments;
     }
 }

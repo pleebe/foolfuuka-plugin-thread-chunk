@@ -23,6 +23,7 @@ class HHVM_thread_chunk
                 $autoloader = $context->getService('autoloader');
                 $autoloader->addClassMap([
                     'Foolz\FoolFuuka\Controller\Chan\ThreadChunk' => __DIR__ . '/classes/controller/chan.php',
+                    'Foolz\FoolFuuka\Controller\Api\ThreadChunk' => __DIR__ . '/classes/controller/api/chan.php',
                     'Foolz\FoolFuuka\Plugins\ThreadChunk\Model\ThreadChunk' => __DIR__ . '/classes/model/chunk.php',
                 ]);
 
@@ -50,6 +51,13 @@ class HHVM_thread_chunk
                                 ]
                             ));
                         }
+                        $routes->getRouteCollection()->add(
+                            'foolfuuka.plugin.thread-chunk.api.chan', new Route(
+                            '/_/api/chan/chunk/',
+                            [
+                                '_controller' => '\Foolz\FoolFuuka\Controller\Api\ThreadChunk::chunk',
+                            ]
+                        ));
                     });
             });
     }

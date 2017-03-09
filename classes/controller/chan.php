@@ -33,15 +33,15 @@ class ThreadChunk extends \Foolz\FoolFuuka\Controller\Chan
         parent::before();
     }
 
-    public function radix_chunk($num = 0, $posts = 500, $start = 0)
+    public function radix_chunk($num = 0, $posts = 500, $start = 1)
     {
         $this->response = new StreamedResponse();
 
-        if(!is_numeric($num))
+        if (!is_numeric($num))
             return $this->error(_i('Invalid thread number.'));
-        if(!is_numeric($posts))
+        if (!is_numeric($posts))
             return $this->error(_i('Invalid first control number.'));
-        if(!is_numeric($start))
+        if (!is_numeric($start))
             return $this->error(_i('Invalid second control number.'));
 
         $thread = $this->chunk->ThreadStatus($this->radix, $num);
@@ -49,11 +49,43 @@ class ThreadChunk extends \Foolz\FoolFuuka\Controller\Chan
             return $this->error(_i('There\'s no such a thread.'));
         }
 
-        if ($start !== 0) {
-            $r_start = $start * $posts;
+        if ($start !== 1) {
+            $r_start = ($start - 1) * $posts;
         } else {
             $r_start = 0;
         }
+
+        if ($r_start == 1) {
+            $omit = $thread['nreplies'] - $posts;
+        } else {
+            $omit = $thread['nreplies'] - (($start - 1) * $posts) - $posts;
+        }
+        if ($omit <= 0) {
+            $omit = 0;
+        }
+
+        $this->builder->getProps()->addTitle(_i('Thread Chunk') . ' #' . $num);
+        $this->builder->getParamManager()->setParams([
+            'chunk_num' => $num,
+            'chunk_posts' => $posts,
+            'chunk_page' => ($start - 1),
+            'chunk_start' => ($start - 1) * $posts,
+            'chunk_omitted' => $omit,
+            'chunk_js' => $this->plugin->getAssetManager()->getAssetLink('chunk.js'),
+            'chunk_css' => $this->plugin->getAssetManager()->getAssetLink('style.css'),
+            'thread_id' => $num,
+            'is_thread' => false,
+            'disable_image_upload' => true,
+            'thread_dead' => true,
+            'nreplies' => $thread['nreplies'],
+            'nimages' => $thread['nimages'],
+            'controller_method' => 'chunk',
+            'pagination' => [
+                'base_url' => $this->uri->create([$this->radix->shortname, 'chunk', $num, $posts]),
+                'current_page' => $start,
+                'total' => ceil($thread['nreplies'] / $posts)
+            ]
+        ]);
 
         try {
             $this->builder->createPartial('body', 'board')
@@ -64,26 +96,6 @@ class ThreadChunk extends \Foolz\FoolFuuka\Controller\Chan
         } catch (\Exception $e) {
             return $this->error(_i('No more posts.'));
         }
-
-        if ($r_start == 0) {
-            $omit = $thread['nreplies'] - $posts;
-        } else {
-            $omit = $thread['nreplies'] - ($start * $posts) - $posts;
-        }
-        if ($omit <= 0) {
-            $omit = 0;
-        }
-
-        $this->builder->getProps()->addTitle(_i('Thread Chunk') . ' #' . $num);
-        $this->builder->getParamManager()->setParams([
-            'chunk_num' => $num,
-            'chunk_posts' => $posts,
-            'chunk_page' => $start,
-            'chunk_start' => $start * $posts,
-            'chunk_omitted' => $omit,
-            'chunk_js' => $this->plugin->getAssetManager()->getAssetLink('chunk.js'),
-            'chunk_css' => $this->plugin->getAssetManager()->getAssetLink('style.css')
-        ]);
 
         Event::forge(['foolfuuka.themes.default_after_body_template'])
             ->setCall('Foolz\FoolFuuka\Plugins\ThreadChunk\Model\ThreadChunk::renderunder')
